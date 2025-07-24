@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Effatha Ambiental</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* Reset e Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #212121;
+            background-color: #F5F5F5;
+        }
+
+        /* Container e Grid System */
+        .container {
+            width: 100vw;
+            padding: 0 20px;
+            margin: 0 auto;
+        }
+
+        .grid-12 {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .col-3 { grid-column: span 3; }
+        .col-4 { grid-column: span 4; }
+        .col-6 { grid-column: span 6; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color, #2E7D32), var(--secondary-color, #4CAF50));
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .company-logo {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .header-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .project-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .project-name {
+            font-size: 1.2rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+        }
+
+        .change-project-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .change-project-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logout-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: white;
+            padding: 1rem 0;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .breadcrumb-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #757575;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color, #2E7D32);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: white;
+            padding: 2rem 0;
+            border-bottom: 1px solid #E0E0E0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .upload-area {
+            border: 3px dashed var(--primary-color, #4CAF50);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            background: #F8F9FA;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--secondary-color, #2E7D32);
+            background: #E8F5E8;
+        }
+
+        .upload-area.dragover {
+            border-color: var(--secondary-color, #2E7D32);
+            background: #E8F5E8;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color, #4CAF50);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: var(--secondary-color, #2E7D32);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            color: #757575;
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-button {
+            background: var(--primary-color, #4CAF50);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .upload-button:hover {
+            background: var(--secondary-color, #2E7D32);
+        }
+
+        /* Period Configuration */
+        .period-config {
+            background: white;
+            padding: 2rem 0;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .period-card {
+            background: #F8F9FA;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #E0E0E0;
+        }
+
+        .period-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.3rem;
+            color: var(--secondary-color, #2E7D32);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .date-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .date-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .date-field label {
+            font-weight: 500;
+            color: #757575;
+            font-size: 0.9rem;
+        }
+
+        .date-field input {
+            padding: 0.75rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .date-field input:focus {
+            outline: none;
+            border-color: var(--primary-color, #4CAF50);
+        }
+
+        .apply-button {
+            background: var(--primary-color, #4CAF50);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        .apply-button:hover {
+            background: var(--secondary-color, #2E7D32);
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #E8F5E8;
+            color: var(--secondary-color, #2E7D32);
+            border: 1px solid var(--primary-color, #4CAF50);
+        }
+
+        .status-error {
+            background: #FFEBEE;
+            color: #C62828;
+            border: 1px solid #F44336;
+        }
+
+        .status-info {
+            background: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #2196F3;
+        }
+
+        /* Filtros */
+        .filters {
+            background: white;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #E0E0E0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .filters .container {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: #757575;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            background: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color, #4CAF50);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        /* KPIs */
+        .kpis {
+            padding: 2rem 0;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .kpi-card h3 {
+            font-size: 1rem;
+            color: #757575;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary-color, #2E7D32);
+            display: block;
+        }
+
+        /* Seções de Gráficos */
+        .chart-section {
+            padding: 2rem 0;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .chart-card h2 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.5rem;
+            color: var(--secondary-color, #2E7D32);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Comparação */
+        .comparison {
+            padding: 2rem 0;
+            background: white;
+        }
+
+        .section-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: 2rem;
+            color: var(--secondary-color, #2E7D32);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-card {
+            background: #F8F9FA;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #E0E0E0;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-card:hover {
+            border-color: var(--primary-color, #4CAF50);
+            transform: translateY(-2px);
+        }
+
+        .comparison-card h3 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.2rem;
+            color: var(--secondary-color, #2E7D32);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .comparison-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #757575;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            color: var(--secondary-color, #2E7D32);
+        }
+
+        .metric-value.improvement {
+            color: #FF9800;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #E0E0E0;
+            border-top: 4px solid var(--primary-color, #4CAF50);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--secondary-color, #2E7D32);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .col-6 { grid-column: span 12; }
+            .col-4 { grid-column: span 6; }
+            .col-3 { grid-column: span 6; }
+            .col-8 { grid-column: span 12; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .header-left {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .project-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .filters .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .grid-12 {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .col-3,
+            .col-4,
+            .col-6,
+            .col-8,
+            .col-12 {
+                grid-column: span 1;
+            }
+            
+            .date-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="company-logo">🌱</div>
+                    <div class="header-title">Effatha Ambiental</div>
+                </div>
+                <div class="project-info">
+                    <div class="project-name" id="projectName">Carregando...</div>
+                    <button class="change-project-btn" onclick="changeProject()">Trocar Projeto</button>
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Usuário: <span id="currentUser">-</span></div>
+                    <button class="logout-button" onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <div class="container">
+            <div class="breadcrumb-content">
+                <a href="project-selector.html">Effatha Ambiental</a>
+                <span>›</span>
+                <a href="project-selector.html">Projetos</a>
+                <span>›</span>
+                <span id="breadcrumbProject">Dashboard</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Upload Section -->
+    <section class="upload-section">
+        <div class="container">
+            <div class="grid-12">
+                <div class="col-8">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Arraste e solte seu arquivo JSON aqui</div>
+                        <div class="upload-subtext">ou clique para selecionar um arquivo</div>
+                        <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                            Selecionar Arquivo
+                        </button>
+                        <input type="file" id="fileInput" class="file-input" accept=".json" />
+                    </div>
+                    <div id="statusMessage"></div>
+                </div>
+                <div class="col-4">
+                    <div class="period-card">
+                        <div class="period-title">Configurar Períodos</div>
+                        <div class="date-group">
+                            <div class="date-field">
+                                <label>Baseline - Início</label>
+                                <input type="date" id="baselineStart" />
+                            </div>
+                            <div class="date-field">
+                                <label>Baseline - Fim</label>
+                                <input type="date" id="baselineEnd" />
+                            </div>
+                        </div>
+                        <div class="date-group">
+                            <div class="date-field">
+                                <label>Tratamento - Início</label>
+                                <input type="date" id="treatmentStart" />
+                            </div>
+                            <div class="date-field">
+                                <label>Tratamento - Fim</label>
+                                <input type="date" id="treatmentEnd" />
+                            </div>
+                        </div>
+                        <button class="apply-button" onclick="applyPeriodConfiguration()">
+                            Aplicar Configuração
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Carregando dados do projeto...</p>
+    </div>
+
+    <!-- Filtros -->
+    <section class="filters">
+        <div class="container">
+            <div class="filter-group">
+                <label for="period-filter">Período:</label>
+                <select id="period-filter" class="filter-select">
+                    <option value="all">Todos os Dados</option>
+                    <option value="baseline">Baseline</option>
+                    <option value="treatment">Tratamento</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="location-filter">Local:</label>
+                <select id="location-filter" class="filter-select">
+                    <option value="all">Todos os Pontos</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="kpis">
+        <div class="container">
+            <div class="grid-12">
+                <div class="kpi-card col-3">
+                    <h3>Total de Medições</h3>
+                    <span class="kpi-value" id="total-measurements">-</span>
+                </div>
+                <div class="kpi-card col-3">
+                    <h3>Pontos Monitorados</h3>
+                    <span class="kpi-value" id="total-locations">-</span>
+                </div>
+                <div class="kpi-card col-3">
+                    <h3>Período de Análise</h3>
+                    <span class="kpi-value" id="analysis-period">-</span>
+                </div>
+                <div class="kpi-card col-3">
+                    <h3>Métrica Principal</h3>
+                    <span class="kpi-value" id="main-metric">-</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gráfico de Linha - Evolução Temporal -->
+    <section class="chart-section">
+        <div class="container">
+            <div class="chart-card col-12">
+                <h2>Evolução Temporal</h2>
+                <div class="chart-container">
+                    <canvas id="line-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gráficos de Barras e Pizza -->
+    <section class="chart-section">
+        <div class="container">
+            <div class="grid-12">
+                <div class="chart-card col-6">
+                    <h2>Análise por Local</h2>
+                    <div class="chart-container">
+                        <canvas id="bar-chart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card col-6">
+                    <h2>Distribuição de Categorias</h2>
+                    <div class="chart-container">
+                        <canvas id="pie-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gráficos Avançados -->
+    <section class="chart-section">
+        <div class="container">
+            <div class="grid-12">
+                <div class="chart-card col-6">
+                    <h2>Variações Diárias (Candlestick)</h2>
+                    <div class="chart-container">
+                        <div id="candlestick-chart" style="width:100%;height:100%;"></div>
+                    </div>
+                </div>
+                <div class="chart-card col-6">
+                    <h2>Timeline das Coletas (Gantt)</h2>
+                    <div class="chart-container">
+                        <div id="gantt-chart" style="width:100%;height:100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparação Baseline vs Tratamento -->
+    <section class="comparison">
+        <div class="container">
+            <h2 class="section-title">Comparação: Baseline vs Tratamento</h2>
+            <div class="grid-12">
+                <div class="comparison-card col-4">
+                    <h3 id="baseline-title">Baseline</h3>
+                    <div class="comparison-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Métrica Principal:</span>
+                            <span class="metric-value" id="baseline-main">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Métrica Secundária:</span>
+                            <span class="metric-value" id="baseline-secondary">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Medições:</span>
+                            <span class="metric-value" id="baseline-count">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-card col-4">
+                    <h3 id="treatment-title">Tratamento</h3>
+                    <div class="comparison-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Métrica Principal:</span>
+                            <span class="metric-value" id="treatment-main">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Métrica Secundária:</span>
+                            <span class="metric-value" id="treatment-secondary">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Medições:</span>
+                            <span class="metric-value" id="treatment-count">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-card col-4">
+                    <h3>Melhoria</h3>
+                    <div class="comparison-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Variação Principal:</span>
+                            <span class="metric-value improvement" id="main-improvement">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Variação Secundária:</span>
+                            <span class="metric-value" id="secondary-variation">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Eficácia:</span>
+                            <span class="metric-value improvement" id="effectiveness">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Effatha Ambiental - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script src="dashboard-multiprojetos.js"></script>
+</body>
+</html>
+
