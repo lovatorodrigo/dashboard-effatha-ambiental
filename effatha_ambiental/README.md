@@ -1,4 +1,4 @@
-# Dashboard ProVaso - Análise de Monitoramento Ambiental
+# Dashboard Effatha Ambiental - Análise de Monitoramento Ambiental
 
 ## Descrição
 
