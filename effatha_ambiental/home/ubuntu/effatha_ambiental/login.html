@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dashboard Effatha Ambiental</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #212121;
+        }
+
+        .login-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 2rem;
+            color: #2E7D32;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo p {
+            color: #757575;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #757575;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #F8F9FA;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            background: #E8F5E8;
+            color: #2E7D32;
+            border: 1px solid #4CAF50;
+        }
+
+        .message.error {
+            background: #FFEBEE;
+            color: #C62828;
+            border: 1px solid #F44336;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            margin: 1rem 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #E0E0E0;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .credentials-info {
+            background: #E3F2FD;
+            border: 1px solid #2196F3;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .credentials-info h4 {
+            color: #1565C0;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .credentials-info ul {
+            list-style: none;
+            font-size: 0.8rem;
+            color: #1976D2;
+        }
+
+        .credentials-info li {
+            margin-bottom: 0.3rem;
+            padding: 0.2rem 0;
+            border-bottom: 1px solid #BBDEFB;
+        }
+
+        .credentials-info li:last-child {
+            border-bottom: none;
+        }
+
+        .credentials-info strong {
+            color: #0D47A1;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>Dashboard Effatha Ambiental</h1>
+            <p>Análise de Monitoramento Ambiental</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+
+            <div class="message" id="message"></div>
+
+            <button type="submit" class="login-button" id="loginButton">
+                Entrar
+            </button>
+        </form>
+
+        <div class="credentials-info">
+            <h4>Credenciais de Demonstração:</h4>
+            <ul>
+                <li><strong>admin</strong> / admin123 (Todos os projetos)</li>
+                <li><strong>provaso</strong> / provaso2025 (Projeto ProVaso)</li>
+                <li><strong>analista</strong> / analise123 (Projeto ProVaso)</li>
+                <li><strong>industrial_admin</strong> / industrial123 (Projeto Industrial ABC)</li>
+                <li><strong>urbano_admin</strong> / urbano123 (Projeto Urbano XYZ)</li>
+                <li><strong>supervisor</strong> / supervisor123 (Múltiplos projetos)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Configuração da API
+        const API_BASE = 'http://localhost:5000/api/auth';
+
+        // Elementos do DOM
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('loginButton');
+        const messageDiv = document.getElementById('message');
+        const loadingDiv = document.getElementById('loading');
+
+        // Event listeners
+        loginForm.addEventListener('submit', handleLogin);
+
+        // Verificar se já está autenticado
+        window.addEventListener('load', checkExistingAuth);
+
+        async function checkExistingAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/check-auth`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated) {
+                        showMessage('Você já está logado. Redirecionando...', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'project-selector.html';
+                        }, 1500);
+                    }
+                }
+            } catch (error) {
+                console.log('Verificação de autenticação falhou:', error);
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!username || !password) {
+                showMessage('Por favor, preencha todos os campos.', 'error');
+                return;
+            }
+
+            setLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showMessage('Login realizado com sucesso! Redirecionando...', 'success');
+                    
+                    // Armazenar informações de sessão
+                    localStorage.setItem('user', data.user);
+                    localStorage.setItem('session_token', data.session_token);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard_v2.html';
+                    }, 1500);
+                } else {
+                    showMessage(data.error || 'Erro ao fazer login', 'error');
+                }
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                showMessage('Erro de conexão. Verifique se o servidor está rodando.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type} show`;
+            
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function setLoading(loading) {
+            if (loading) {
+                loadingDiv.classList.add('show');
+                loginButton.disabled = true;
+                loginButton.textContent = 'Entrando...';
+            } else {
+                loadingDiv.classList.remove('show');
+                loginButton.disabled = false;
+                loginButton.textContent = 'Entrar';
+            }
+        }
+
+        // Permitir login com Enter
+        usernameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                passwordInput.focus();
+            }
+        });
+
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleLogin(e);
+            }
+        });
+    </script>
+</body>
+</html>
+

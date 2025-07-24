@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effatha Ambiental - Seleção de Projetos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #212121;
+            background: linear-gradient(135deg, #E8F5E8, #F1F8E9);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .company-info h1 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .company-info p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .logout-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title h2 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 2.5rem;
+            color: #2E7D32;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            font-size: 1.2rem;
+            color: #757575;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #E0E0E0;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border-color: #4CAF50;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .project-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #E8F5E8;
+            color: #2E7D32;
+        }
+
+        .status-paused {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .status-completed {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .project-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.5rem;
+            color: #2E7D32;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-client {
+            font-size: 1rem;
+            color: #757575;
+            margin-bottom: 1rem;
+        }
+
+        .project-description {
+            color: #616161;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1rem;
+            background: #F8F9FA;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2E7D32;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #757575;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .project-permission {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #E8F5E8;
+            color: #2E7D32;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .permission-admin {
+            background: #E8F5E8;
+            color: #2E7D32;
+        }
+
+        .permission-analista {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .permission-visualizador {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .access-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .access-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #757575;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #616161;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #FFEBEE;
+            color: #C62828;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #F44336;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2E7D32;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer p {
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .company-info h1 {
+                font-size: 1.5rem;
+            }
+
+            .page-title h2 {
+                font-size: 2rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .main-content {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🌱</div>
+                <div class="company-info">
+                    <h1>Effatha Ambiental</h1>
+                    <p>Monitoramento e Análise Ambiental</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-name">Usuário: <span id="currentUser">-</span></div>
+                <button class="logout-button" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-title">
+            <h2>Selecione um Projeto</h2>
+            <p>Escolha o projeto que deseja analisar</p>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Carregando projetos...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+        <!-- Projects Grid -->
+        <div class="projects-grid" id="projectsGrid"></div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-state-icon">📁</div>
+            <h3>Nenhum projeto encontrado</h3>
+            <p>Você não tem acesso a nenhum projeto no momento.<br>Entre em contato com o administrador para obter acesso.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Effatha Ambiental - Todos os direitos reservados</p>
+    </footer>
+
+    <script>
+        // Configuração da API
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Elementos do DOM
+        const loadingDiv = document.getElementById('loading');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        const projectsGrid = document.getElementById('projectsGrid');
+        const emptyState = document.getElementById('emptyState');
+        const currentUserSpan = document.getElementById('currentUser');
+
+        // Verificar autenticação e carregar projetos
+        window.addEventListener('load', function() {
+            checkAuthenticationAndLoadProjects();
+        });
+
+        async function checkAuthenticationAndLoadProjects() {
+            try {
+                showLoading(true);
+                
+                // Verificar autenticação
+                const authResponse = await fetch(`${API_BASE}/auth/check-auth`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!authResponse.ok) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const authData = await authResponse.json();
+                if (!authData.authenticated) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUserSpan.textContent = authData.user;
+
+                // Carregar projetos
+                await loadProjects();
+
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                showError('Erro de conexão. Verifique se o servidor está rodando.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_BASE}/projects/list`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar projetos');
+                }
+
+                const data = await response.json();
+                displayProjects(data.projects);
+
+            } catch (error) {
+                console.error('Erro ao carregar projetos:', error);
+                showError('Erro ao carregar projetos. Tente novamente.');
+            }
+        }
+
+        function displayProjects(projects) {
+            if (!projects || projects.length === 0) {
+                emptyState.style.display = 'block';
+                projectsGrid.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            projectsGrid.style.display = 'grid';
+            projectsGrid.innerHTML = '';
+
+            projects.forEach(project => {
+                const projectCard = createProjectCard(project);
+                projectsGrid.appendChild(projectCard);
+            });
+        }
+
+        function createProjectCard(project) {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            card.onclick = () => accessProject(project.id);
+
+            // Determinar cor do ícone baseada no projeto
+            const iconColors = {
+                'provaso': '#2E7D32',
+                'industrial_abc': '#1976D2',
+                'urbano_xyz': '#FF9800'
+            };
+            const iconColor = iconColors[project.id] || '#2E7D32';
+
+            // Determinar ícone baseado no tipo de projeto
+            const icons = {
+                'provaso': '🏭',
+                'industrial_abc': '🏭',
+                'urbano_xyz': '🏙️'
+            };
+            const icon = icons[project.id] || '📊';
+
+            // Status do projeto
+            const statusClass = `status-${project.status}`;
+            const statusText = {
+                'active': 'Ativo',
+                'paused': 'Pausado',
+                'completed': 'Concluído'
+            }[project.status] || 'Ativo';
+
+            // Classe da permissão
+            const permissionClass = `permission-${project.permission_level}`;
+            const permissionText = {
+                'admin': 'Administrador',
+                'analista': 'Analista',
+                'visualizador': 'Visualizador'
+            }[project.permission_level] || 'Analista';
+
+            card.innerHTML = `
+                <div class="project-header">
+                    <div class="project-icon" style="background: ${iconColor};">
+                        ${icon}
+                    </div>
+                    <div class="project-status ${statusClass}">
+                        ${statusText}
+                    </div>
+                </div>
+                
+                <h3 class="project-title">${project.name}</h3>
+                <p class="project-client">${project.client || 'Cliente não informado'}</p>
+                <p class="project-description">${project.description || 'Sem descrição disponível'}</p>
+                
+                <div class="project-stats">
+                    <div class="stat">
+                        <span class="stat-value">${project.measurement_count || 0}</span>
+                        <span class="stat-label">Medições</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">${project.user_count || 0}</span>
+                        <span class="stat-label">Usuários</span>
+                    </div>
+                </div>
+                
+                <div class="project-permission ${permissionClass}">
+                    ${permissionText}
+                </div>
+                
+                <button class="access-button">
+                    Acessar Dashboard
+                </button>
+            `;
+
+            return card;
+        }
+
+        function accessProject(projectId) {
+            // Salvar projeto selecionado no localStorage
+            localStorage.setItem('selectedProject', projectId);
+            
+            // Redirecionar para o dashboard
+            window.location.href = `dashboard-multiprojetos.html?project=${projectId}`;
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    localStorage.removeItem('selectedProject');
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Erro ao fazer logout');
+                }
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error);
+                // Forçar logout local mesmo com erro
+                localStorage.removeItem('selectedProject');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function showLoading(show) {
+            loadingDiv.style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorMessageDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+

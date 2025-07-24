@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Debug Dashboard</h1>
+    <div id="debug-info"></div>
+    <canvas id="test-chart" width="400" height="200"></canvas>
+    
+    <script>
+        console.log('Debug page loaded');
+        
+        // Testar Chart.js
+        const ctx = document.getElementById('test-chart').getContext('2d');
+        const testChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['A', 'B', 'C'],
+                datasets: [{
+                    label: 'Test',
+                    data: [1, 2, 3],
+                    backgroundColor: ['red', 'green', 'blue']
+                }]
+            }
+        });
+        
+        // Testar fetch
+        fetch('data.json')
+            .then(response => {
+                console.log('Fetch response:', response);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Data loaded:', text.substring(0, 100));
+                document.getElementById('debug-info').innerHTML = 
+                    '<p>Data loaded successfully: ' + text.length + ' characters</p>';
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('debug-info').innerHTML = 
+                    '<p>Error loading data: ' + error.message + '</p>';
+            });
+    </script>
+</body>
+</html>
+
